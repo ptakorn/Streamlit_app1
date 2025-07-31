@@ -1,12 +1,12 @@
 
 import streamlit as st
 import pandas as pd
-from pycaret.classification import load_model, predict_model
+import joblib
 
-# Load the saved model
-model = load_model('loan_approval_model')
+# Load model
+model = joblib.load("loan_approval_model.pkl")
 
-# Streamlit UI
+# App layout
 st.title("🏦 Loan Approval Predictor")
 st.write("Enter applicant details to predict loan approval.")
 
@@ -23,7 +23,7 @@ loan_term = st.selectbox("Loan Amount Term", [12, 36, 60, 84, 120, 180, 240, 300
 credit_history = st.selectbox("Credit History", [1.0, 0.0])
 property_area = st.selectbox("Property Area", ["Urban", "Rural", "Semiurban"])
 
-# Submit button
+# Predict
 if st.button("Predict"):
     input_df = pd.DataFrame({
         'Gender': [gender],
@@ -39,8 +39,6 @@ if st.button("Predict"):
         'Property_Area': [property_area]
     })
 
-    prediction = predict_model(model, data=input_df)
-    result = prediction['Label'][0]
+    result = model.predict(input_df)[0]
     status = "Approved ✅" if result == 1 else "Rejected ❌"
-
     st.success(f"Loan Prediction Result: {status}")
